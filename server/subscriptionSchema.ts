@@ -1,6 +1,6 @@
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { withFilter } from 'graphql-subscriptions';
-import { EVENT_BOOKING_CREATED } from './constants/constants';
+import { EVENT_BOOKING_CREATED } from './src/constants/constants';
 import { pubSub } from './pub-sub';
 
 const typeDefs = `#graphql

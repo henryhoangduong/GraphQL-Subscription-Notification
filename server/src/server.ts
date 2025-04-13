@@ -6,22 +6,18 @@ import { createServer } from 'http';
 import { WebSocketServer } from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
 import { mergeSchemas } from '@graphql-tools/schema';
-
-
+import { buildSchema } from 'type-graphql';
 const PORT = 3000;
-const app =
-  express();
+const app = express();
 
-const httpServer =
-  createServer(
-    app,
-  );
+const httpServer = createServer(app);
 
-const wsServer =
-  new WebSocketServer(
-    {
-      server:
-        httpServer,
-      path: '/graphql',
-    },
-  );
+const wsServer = new WebSocketServer({
+  server: httpServer,
+  path: '/graphql',
+});
+
+const typeGraphQLSchema = await buildSchema({
+  resolvers:[]
+  emitSchemaFile: true,
+});
