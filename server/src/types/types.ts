@@ -1,319 +1,312 @@
-import { Field, Float, ID, InputType, Int, ObjectType } from 'type-graphql';
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  JoinTable,
-  ManyToMany,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  Relation,
-} from 'typeorm';
+import { Field, Float, ID, InputType, Int, ObjectType } from "type-graphql";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, Relation } from "typeorm";
 
 @ObjectType()
-@Entity('Artist')
+@Entity("Artist")
 export class Artist {
-  @Field((type) => ID)
-  @PrimaryGeneratedColumn()
-  id: number;
+    
+    @Field(type => ID)
+    @PrimaryGeneratedColumn()
+    id: number;
 
-  @Field()
-  @Column()
-  name: string;
+    @Field()
+    @Column()
+    name: string;
 
-  @Field()
-  @Column()
-  bio: string;
+    @Field()
+    @Column()
+    bio: string;
 
-  @Field()
-  @Column({
-    nullable: true,
-  })
-  imageUrl?: string;
+    @Field()
+    @Column({ nullable: true })
+    imageUrl?: string;
 
-  @Field((type) => [Event])
-  @ManyToMany(() => Event, (event) => event.artists)
-  events: Event[];
-}
+    @Field(type => [Event])
+    @ManyToMany(() => Event, (event) => event.artists)
+    events: Event[];
+  }
+  
+  @ObjectType()
+  @Entity("Booking")
+  export class Booking {
+    @Field((type) => ID)
+    @PrimaryGeneratedColumn()
+    id: number;
 
-@ObjectType()
-@Entity('Booking')
-export class Booking {
-  @Field((type) => ID)
-  @PrimaryGeneratedColumn()
-  id: number;
+    @Field((type) => Date)
+    @Column()
+    bookingDate: Date;
 
-  @Field((type) => Date)
-  @Column()
-  bookingDate: Date;
+    @Field((type) => Int)
+    @Column()
+    userId: number;
 
-  @Field((type) => Int)
-  @Column()
-  userId: number;
+    @Field((type) => Int)
+    @Column()
+    eventId: number;
 
-  @Field((type) => Int)
-  @Column()
-  eventId: number;
+    @Field((type) => Event)
+    @ManyToOne(() => Event, (event) => event.id)
+    @JoinColumn({ name: "eventId" })
+    event?: Relation<Event>;
 
-  @Field((type) => Float)
-  @Column()
-  price: number;
+    @Field((type) => Float)
+    @Column()
+    price: number;
 
-  @Field((type) => [Ticket])
-  @OneToMany(() => Ticket, (ticket) => ticket.booking)
-  tickets: Ticket[];
-}
+    @Field((type) => [Ticket])
+    @OneToMany(() => Ticket, (ticket) => ticket.booking)
+    tickets: Ticket[];
+  }
 
-@InputType()
-export class BookingInput {
-  @Field((type) => Int)
-  eventId: number;
-  @Field((type) => [Int])
-  seats: number[];
-}
+  @InputType()
+  export class BookingInput {
+    @Field(type => Int)
+    eventId: number;
+    @Field(type => [Int])
+    seats: number[];
+  }
+  
+  
+  @ObjectType()
+  @Entity("Event")
+  export class Event {
 
-@ObjectType()
-@Entity('Event')
-export class Event {
-  @Field((type) => ID)
-  @PrimaryGeneratedColumn()
-  id: number;
+    @Field(type => ID)
+    @PrimaryGeneratedColumn()
+    id: number;
+    
+    @Field()
+    @Column()
+    name: string;
 
-  @Field()
-  @Column()
-  name: string;
+    @Field()
+    @Column()
+    description: string;
 
-  @Field()
-  @Column()
-  description: string;
+    @Field(type => Date)
+    @Column()
+    eventDate: Date;
 
-  @Field((type) => Date)
-  @Column()
-  eventDate: Date;
+    @Field()
+    @Column({ nullable: true })
+    category: string;
 
-  @Field()
-  @Column({
-    nullable: true,
-  })
-  category: string;
+    @Field()
+    @Column({ nullable: true })
+    imageUrl?: string;
 
-  @Field()
-  @Column({
-    nullable: true,
-  })
-  imageUrl?: string;
+    @Field(type => Int)
+    @Column()
+    venueId: number;
 
-  @Field((type) => Int)
-  @Column()
-  venueId: number;
+    @Field(type => Venue)
+    @ManyToOne(() => Venue, (venue) => venue.id)
+    @JoinColumn({name: 'venueId'})
+    venue?: Relation<Venue>;
 
-  @Field((type) => Venue)
-  @ManyToOne(() => Venue, (venue) => venue.id)
-  @JoinColumn({
-    name: 'venueId',
-  })
-  venue?: Relation<Venue>;
+    @Field(type => [Artist])
+    @ManyToMany(() => Artist, (artist) => artist.events)
+    @JoinTable({name: "Event_Artist"})
+    artists: Artist[];
+  }
+  
+  @Entity("Review") 
+  export class Review {
+    @PrimaryGeneratedColumn()
+    id: number;
 
-  @Field((type) => [Artist])
-  @ManyToMany(() => Artist, (artist) => artist.events)
-  @JoinTable({
-    name: 'Event_Artist',
-  })
-  artists: Artist[];
-}
+    @Column()
+    rating: number;
 
-@Entity('Review')
-export class Review {
-  @PrimaryGeneratedColumn()
-  id: number;
+    @Column({ nullable: true })
+    comment?: string;
 
-  @Column()
-  rating: number;
+    @Column()
+    userId: number;
 
-  @Column({
-    nullable: true,
-  })
-  comment?: string;
+    @Column()
+    eventId: number;
+  }
+  
+  @ObjectType()
+  @Entity("Ticket")
+  export class Ticket {
+    @Field(type => ID)
+    @PrimaryGeneratedColumn()
+    id: number;
 
-  @Column()
-  userId: number;
+    @Field(type => Int)
+    @Column()
+    seatNo: number;
 
-  @Column()
-  eventId: number;
-}
+    @Field(type => Int)
+    @Column()
+    bookingId: number;
 
-@ObjectType()
-@Entity('Ticket')
-export class Ticket {
-  @Field((type) => ID)
-  @PrimaryGeneratedColumn()
-  id: number;
+    @Field(type => Booking)
+    @ManyToOne(() => Booking, (booking) => booking.tickets)
+    @JoinColumn({name: 'bookingId'})
+    booking: Booking;
+  }
+  
+  @ObjectType()
+  @Entity("User")
+  export class User {
 
-  @Field((type) => Int)
-  @Column()
-  seatNo: number;
+    @Field(type => ID)
+    @PrimaryGeneratedColumn()
+    id: number;
 
-  @Field((type) => Int)
-  @Column()
-  bookingId: number;
+    @Field() 
+    @Column()
+    name: string;
 
-  @Field((type) => Booking)
-  @ManyToOne(() => Booking, (booking) => booking.tickets)
-  @JoinColumn({
-    name: 'bookingId',
-  })
-  booking: Booking;
-}
+    @Field()
+    @Column()
+    email: string;
 
-@ObjectType()
-@Entity('User')
-export class User {
-  @Field((type) => ID)
-  @PrimaryGeneratedColumn()
-  id: number;
+    @Field()
+    @Column()
+    password: string;
 
-  @Field()
-  @Column()
-  name: string;
+    @Field()
+    @Column()
+    role: string;
+  }
 
-  @Field()
-  @Column()
-  email: string;
+  @InputType()
+  export class UserInput{
+    @Field()
+    name: string;
+    @Field()
+    email: string;
+    @Field()
+    password: string;
+    @Field({nullable: true})
+    role?: string;
+  }
+  
+  @ObjectType()
+  @Entity("Venue")
+  export class Venue {
 
-  @Field()
-  @Column()
-  password: string;
+    @Field(type => ID)
+    @PrimaryGeneratedColumn()
+    id: number;
 
-  @Field()
-  @Column()
-  role: string;
-}
+    @Field()
+    @Column()
+    name: string;
 
-@InputType()
-export class UserInput {
-  @Field()
-  name: string;
-  @Field()
-  email: string;
-  @Field()
-  password: string;
-  @Field({
-    nullable: true,
-  })
-  role?: string;
-}
+    @Field()
+    @Column()
+    address: string;
 
-@ObjectType()
-@Entity('Venue')
-export class Venue {
-  @Field((type) => ID)
-  @PrimaryGeneratedColumn()
-  id: number;
+    @Field()
+    @Column()
+    location: string;
 
-  @Field()
-  @Column()
-  name: string;
+    @Field(type => Int)
+    @Column()
+    capacity: number;
 
-  @Field()
-  @Column()
-  address: string;
+    @Field(type => [Event])
+    @OneToMany(() => Event, (event) => event.venueId)
+    events: Event[];
+  }
 
-  @Field()
-  @Column()
-  location: string;
+  @ObjectType()
+  export class Weather {
+    @Field((type) => Float)
+    temp: number;
+    @Field((type) => Float)
+    feels_like: number;
+    @Field((type) => Float)
+    temp_min: number;
+    @Field((type) => Float)
+    temp_max: number;
+    @Field((type) => Float)
+    humidity: number;
+    @Field()
+    description: string;
+    @Field()
+    main: string;
+    @Field()
+    icon: string;
+    @Field()
+    windSpeed: string;
+  }
 
-  @Field((type) => Int)
-  @Column()
-  capacity: number;
 
-  @Field((type) => [Event])
-  @OneToMany(() => Event, (event) => event.venueId)
-  events: Event[];
-}
+  @InputType()
+  export class EventInput{
+    @Field()
+    name: string;
 
-@ObjectType()
-export class Weather {
-  @Field((type) => Float)
-  temp: number;
-  @Field((type) => Float)
-  feels_like: number;
-  @Field((type) => Float)
-  temp_min: number;
-  @Field((type) => Float)
-  temp_max: number;
-  @Field((type) => Float)
-  humidity: number;
-  @Field()
-  description: string;
-}
+    @Field()
+    description: string;
 
-@InputType()
-export class EventInput {
-  @Field()
-  name: string;
+    @Field()
+    eventDate: string;
 
-  @Field()
-  description: string;
+    @Field()
+    category: string;
 
-  @Field()
-  eventDate: string;
+    @Field({nullable: true})
+    imageUrl?: string;
 
-  @Field()
-  category: string;
+    @Field(type => Int)
+    venueId: number;
 
-  @Field({
-    nullable: true,
-  })
-  imageUrl?: string;
+    @Field(type => [Int])
+    artistIds: number[];
+  }
 
-  @Field((type) => Int)
-  venueId: number;
+  @InputType()
+  export class VenueInput{
+    @Field()
+    name: string;
+    @Field()
+    address: string;
+    @Field()
+    location: string;
+    @Field()
+    capacity: number;
+  }
 
-  @Field((type) => [Int])
-  artistIds: number[];
-}
+  @InputType()
+  export class LoginInput {
+    @Field()
+    email: string;
+    @Field()
+    password: string;
+  }
 
-@InputType()
-export class VenueInput {
-  @Field()
-  name: string;
-  @Field()
-  address: string;
-  @Field()
-  location: string;
-  @Field()
-  capacity: number;
-}
+  @ObjectType()
+  export class LoginToken {
+    @Field()
+    accessToken: string;
+    @Field()
+    refreshToken: string;
+  }
 
-@InputType()
-export class LoginInput {
-  @Field()
-  email: string;
-  @Field()
-  password: string;
-}
+  export class UserContext {
+    name: string;
+    id: number;
+    role: string;
+  }
 
-@ObjectType()
-export class LoginToken {
-  @Field()
-  accessToken: string;
-  @Field()
-  refreshTokesn: string;
-}
+  export class AppContext {
+    userContext?: UserContext;
+  }
 
-export class UserContext {
-  name: string;
-  id: number;
-  role: string;
-}
-
-export class AppContext {
-  userContext?: UserContext;
-}
-
-export class EventSeatAvailability {
-  eventId: number;
-  seatsAvailable: number;
-  seatNos: number[];
-}
+  @ObjectType()
+  export class EventSeatAvailability {
+    @Field(type => Int)
+    eventId: number;
+    @Field(type => Int)
+    seatsAvailable: number;
+    @Field((type) => [Int])
+    seatNos: number[];
+  }

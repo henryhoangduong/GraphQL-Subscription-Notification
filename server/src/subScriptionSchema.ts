@@ -1,7 +1,7 @@
-import { makeExecutableSchema } from '@graphql-tools/schema';
-import { withFilter } from 'graphql-subscriptions';
-import { EVENT_BOOKING_CREATED } from './src/constants/constants';
-import { pubSub } from './pub-sub';
+import { makeExecutableSchema } from "@graphql-tools/schema";
+import { withFilter } from "graphql-subscriptions";
+import { EVENT_BOOKING_CREATED } from "./constants/constants.js";
+import { pubSub } from "./pub-sub.js";
 
 const typeDefs = `#graphql
   type Subscription{
@@ -23,7 +23,7 @@ const resolvers = {
           return payload.eventSeatAvailabilityNotification.eventId === variables.eventId;
         }
       ),
-    },
-  },
+    }
+  }
 };
 export const subScriptionSchema = makeExecutableSchema({ typeDefs, resolvers });
